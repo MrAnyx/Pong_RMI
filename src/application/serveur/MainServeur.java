@@ -8,11 +8,14 @@ import javafx.stage.Stage;
 
 public class MainServeur extends Application{
 
+	public static Parent root;
+	public static Scene scene;
+	
 
 	public void start(Stage primaryStage) throws Exception{
 		try {
-			Parent root = FXMLLoader.load(getClass().getResource("VueServeur.fxml"));
-			Scene scene = new Scene(root);
+			root = FXMLLoader.load(getClass().getResource("VueServeur.fxml"));
+			scene = new Scene(root);
 			primaryStage.setTitle("VUE SERVEUR");
 			primaryStage.setScene(scene);
 			primaryStage.setResizable(false);

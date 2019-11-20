@@ -34,6 +34,8 @@ public class CtrlServeur extends UnicastRemoteObject implements HelloInterface{
 	
 	@FXML TextArea taInfo;
 	
+	@FXML TextField tbStatus;
+	
 	private int port;
 	private String addressIP;
 	private String nom;
@@ -44,6 +46,7 @@ public class CtrlServeur extends UnicastRemoteObject implements HelloInterface{
 	@FXML private void initialize() {
 		taInfo.appendText("Lancement de la fenêtre\n");
 		afficheInfoReseau();
+		tbStatus.setStyle("-fx-background-color:#ff0000");
 	}
 	
 	private void afficheInfoReseau() {
@@ -130,8 +133,12 @@ public class CtrlServeur extends UnicastRemoteObject implements HelloInterface{
 		if(refRegistry == null) {
 			lancerAnnuaire();
 			lancerServeur();
+
+			tbStatus.setStyle("-fx-background-color:#00ff00");
 		}else {
 			stopperServeur();
+
+			tbStatus.setStyle("-fx-background-color:#ff0000");
 		}
 		
 	}
