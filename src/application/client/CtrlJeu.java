@@ -1,7 +1,9 @@
 package application.client;
 
+import java.rmi.RemoteException;
 import java.util.Random;
 
+import application.serveur.CtrlServeur;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
@@ -17,91 +19,81 @@ import javafx.util.Duration;
 
 public class CtrlJeu {
 	
-	private static final int width = 800;
-	private static final int height = 600;
-	
-	private static final int PLAYER_HEIGHT = 100;
-	private static final int PLAYER_WIDTH = 15;
-	private static final double BALL_R = 15;
-	
-	private int ballYSpeed = 1;
-	private int ballXSpeed = 1;
-	
-	private double playerOneYPos = height / 2;
-	private double playerTwoYPos = height / 2;
-	
-	private int playerOneXPos = 0;
-	private double playerTwoXPos = width - PLAYER_WIDTH;
-	
-	private double ballXPos = width / 2;
-	private double ballYPos = height / 2;
-	
-	private int scoreP1 = 0;
-	private int scoreP2 = 0;
-	
-	private boolean gameStarted;
-	
 	@FXML Canvas canvas;
-	
-	@FXML public void initialize() {
-		try {
-			start();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-	}
-	
+
 	
 	public void start() throws Exception {
 		GraphicsContext gc = canvas.getGraphicsContext2D();
-		Timeline tm = new Timeline(new KeyFrame(Duration.millis(10), e -> run(gc)));
+		Timeline tm = new Timeline(new KeyFrame(Duration.millis(10), e -> {
+			try {
+				run(gc);
+			} catch (RemoteException e2) {
+				System.out.println(e2.getMessage());
+			}
+		}));
 		tm.setCycleCount(Timeline.INDEFINITE);
-		canvas.setOnMouseMoved(e ->  playerOneYPos  = e.getY());
-		canvas.setOnMouseClicked(e ->  gameStarted = true);
+		canvas.setOnMouseMoved(e ->  {
+			try {
+				CtrlClient.stub.setPlayerOneY(e.getY());
+			} catch (RemoteException e1) {
+				System.out.println(e1.getMessage());
+			}
+		});
+		canvas.setOnMouseClicked(e ->  {
+			try {
+				CtrlClient.stub.setGameStarted(true);
+			} catch (RemoteException e1) {
+				System.out.println(e1.getMessage());
+			}
+		});
 		tm.play();
 	}
 	
-	private void run(GraphicsContext gc) {
+	private void run(GraphicsContext gc) throws RemoteException {
 		gc.setFill(Color.BLACK);
-		gc.fillRect(0, 0, width, height);
+		gc.fillRect(0, 0, 800, 600);
 		gc.setFill(Color.WHITE);
 		gc.setFont(Font.font(25));
-		if(gameStarted) {
-			ballXPos+=ballXSpeed;
-			ballYPos+=ballYSpeed;
-			if(ballXPos < width - width  / 4) {
-				playerTwoYPos = ballYPos - PLAYER_HEIGHT / 2;
+		if(CtrlClient.stub.getGameStarted()) {
+			CtrlClient.stub.setBallX(CtrlClient.stub.getBallX()+CtrlClient.stub.getBallSpeedX());
+			CtrlClient.stub.setBallY(CtrlClient.stub.getBallY()+CtrlClient.stub.getBallSpeedY());
+			if(CtrlClient.stub.getBallX() < 800 - 800  / 4) {
+				CtrlClient.stub.setPlayerTwoY(CtrlClient.stub.getBallY() - CtrlServeur.PLAYER_HEIGHT / 2);
 			}  else {
-				playerTwoYPos =  ballYPos > playerTwoYPos + PLAYER_HEIGHT / 2 ?playerTwoYPos += 1: playerTwoYPos - 1;
+				if(CtrlClient.stub.getBallY() > CtrlClient.stub.getPlayerTwoY() + CtrlServeur.PLAYER_HEIGHT / 2) {
+					CtrlClient.stub.setPlayerTwoY(CtrlClient.stub.getPlayerTwoY()+1);
+				}else {
+					CtrlClient.stub.setPlayerTwoY(CtrlClient.stub.getPlayerTwoY()-1);
+				}
 			}
-			gc.fillOval(ballXPos, ballYPos, BALL_R, BALL_R);
+			gc.fillOval(CtrlClient.stub.getBallX(), CtrlClient.stub.getBallY(), CtrlServeur.BALL_R, CtrlServeur.BALL_R);
 		} else {
 			gc.setStroke(Color.YELLOW);
 			gc.setTextAlign(TextAlignment.CENTER);
-			gc.strokeText("Click to Start", width / 2, height / 2);
-			ballXPos = width / 2;
-			ballYPos = height / 2;
-			ballXSpeed = new Random().nextInt(2) == 0 ? 1: -1;
-			ballYSpeed = new Random().nextInt(2) == 0 ? 1: -1;
+			gc.strokeText("Click to Start", 800 / 2, 600 / 2);
+			CtrlClient.stub.setBallX(800 / 2);
+			CtrlClient.stub.setBallY(600 / 2);
+			CtrlClient.stub.setBallSpeedX(new Random().nextInt(2) == 0 ? 1: -1);
+			CtrlClient.stub.setBallSpeedY(new Random().nextInt(2) == 0 ? 1: -1);
 		}
-		if(ballYPos > height || ballYPos < 0) ballYSpeed *=-1;
-		if(ballXPos < playerOneXPos - PLAYER_WIDTH) {
-			scoreP2++;
-			gameStarted = false;
+		if(CtrlClient.stub.getBallY() > 600 || CtrlClient.stub.getBallY() < 0) CtrlClient.stub.setBallSpeedY(CtrlClient.stub.getBallSpeedY()*-1);
+		if(CtrlClient.stub.getBallX() < CtrlClient.stub.getPlayerOneX() - CtrlServeur.PLAYER_WIDTH) {
+			CtrlClient.stub.setScoreTwo(CtrlClient.stub.getScoreTwo()+1);
+			CtrlClient.stub.setGameStarted(false);
 		}
-		if(ballXPos > playerTwoXPos + PLAYER_WIDTH) {  
-			scoreP1++;
-			gameStarted = false;
+		if(CtrlClient.stub.getBallX() > CtrlClient.stub.getPlayerTwoX() + CtrlServeur.PLAYER_WIDTH) {  
+			CtrlClient.stub.setScoreOne(CtrlClient.stub.getScoreOne()+1);
+			CtrlClient.stub.setGameStarted(false);
 		}
-		if( ((ballXPos + BALL_R > playerTwoXPos) && ballYPos >= playerTwoYPos && ballYPos <= playerTwoYPos + PLAYER_HEIGHT) || 
-			((ballXPos < playerOneXPos + PLAYER_WIDTH) && ballYPos >= playerOneYPos && ballYPos <= playerOneYPos + PLAYER_HEIGHT)) {
+		if( ((CtrlClient.stub.getBallX() + CtrlServeur.BALL_R > CtrlClient.stub.getPlayerTwoX()) && CtrlClient.stub.getBallY() >= CtrlClient.stub.getPlayerTwoY() && CtrlClient.stub.getBallY() <= CtrlClient.stub.getPlayerTwoY() + CtrlServeur.PLAYER_HEIGHT) || 
+			((CtrlClient.stub.getBallX() < CtrlClient.stub.getPlayerOneX() + CtrlServeur.PLAYER_WIDTH) && CtrlClient.stub.getBallY() >= CtrlClient.stub.getPlayerOneY() && CtrlClient.stub.getBallY() <= CtrlClient.stub.getPlayerOneY() + CtrlServeur.PLAYER_HEIGHT)) {
 			
-			ballXSpeed *= -1;
-			ballYSpeed *= -1;
+			CtrlClient.stub.setBallSpeedX(CtrlClient.stub.getBallSpeedX()*-1);
+			CtrlClient.stub.setBallSpeedY(CtrlClient.stub.getBallSpeedY()*-1);
 		}
-		gc.fillText(scoreP1 + "\t\t\t\t\t\t\t\t" + scoreP2, width / 2, 100);
-		gc.fillRect(playerTwoXPos, playerTwoYPos, PLAYER_WIDTH, PLAYER_HEIGHT);
-		gc.fillRect(playerOneXPos, playerOneYPos, PLAYER_WIDTH, PLAYER_HEIGHT);
+		gc.fillText(CtrlClient.stub.getScoreOne() + "\t\t\t\t\t\t\t\t" + CtrlClient.stub.getScoreTwo(), 800 / 2, 100);
+		gc.fillRect(CtrlClient.stub.getPlayerTwoX(), CtrlClient.stub.getPlayerTwoY(), CtrlServeur.PLAYER_WIDTH, CtrlServeur.PLAYER_HEIGHT);
+		gc.fillRect(CtrlClient.stub.getPlayerOneX(), CtrlClient.stub.getPlayerOneY(), CtrlServeur.PLAYER_WIDTH, CtrlServeur.PLAYER_HEIGHT);
 	}
 	
 	

@@ -25,6 +25,8 @@ public class CtrlClient {
 	private int port;
 	private String nom;
 	
+	public static HelloInterface stub;
+	
 	@FXML public void initialize() {
 		tbPort.setText("19000");
 		tbNom.setText("Pong_Serveur");
@@ -38,13 +40,16 @@ public class CtrlClient {
 		
 		try {
 			registry = LocateRegistry.getRegistry(addressIP, port);
-			HelloInterface stub = (HelloInterface) registry.lookup(nom);
+			stub = (HelloInterface) registry.lookup(nom);
 			
 			MainClient.fenJeu.showAndWait();
+			MainClient.ctrlJeu.start();
 			
 		} catch (NumberFormatException | RemoteException e) {
 			System.out.println(e.getMessage());
 		} catch (NotBoundException e) {
+			System.out.println(e.getMessage());
+		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
 	}

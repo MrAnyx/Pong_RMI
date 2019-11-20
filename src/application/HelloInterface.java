@@ -6,14 +6,14 @@ import java.rmi.RemoteException;
 public interface HelloInterface extends Remote{
 
 	//Getters
-	public int getPlayerOneX() throws RemoteException;
-	public int getPlayerOneY() throws RemoteException;
+	public double getPlayerOneX() throws RemoteException;
+	public double getPlayerOneY() throws RemoteException;
 	
-	public int getPlayerTwoX() throws RemoteException;
-	public int getPlayerTwoY() throws RemoteException;
+	public double getPlayerTwoX() throws RemoteException;
+	public double getPlayerTwoY() throws RemoteException;
 	
-	public int getBallX() throws RemoteException;
-	public int getBallY() throws RemoteException;
+	public double getBallX() throws RemoteException;
+	public double getBallY() throws RemoteException;
 	
 	public int getBallSpeedX() throws RemoteException;
 	public int getBallSpeedY() throws RemoteException;
@@ -24,12 +24,12 @@ public interface HelloInterface extends Remote{
 	public int getScoreTwo() throws RemoteException;
 	
 	//Setters
-	public void setPlayerOneY(int playerOneY) throws RemoteException;
+	public void setPlayerOneY(double playerOneY) throws RemoteException;
 	
-	public void setPlayerTwoY(int playerTwoY) throws RemoteException;
+	public void setPlayerTwoY(double playerTwoY) throws RemoteException;
 	
-	public void setBallX(int ballX) throws RemoteException;
-	public void setBallY(int ballY) throws RemoteException;
+	public void setBallX(double ballX) throws RemoteException;
+	public void setBallY(double ballY) throws RemoteException;
 	
 	public void setBallSpeedX(int ballSpeedX) throws RemoteException;
 	public void setBallSpeedY(int ballSpeedY) throws RemoteException;

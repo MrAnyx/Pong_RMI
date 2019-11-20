@@ -1,11 +1,10 @@
 package application.client;
 
-import javafx.animation.KeyFrame;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -27,8 +26,6 @@ public class MainClient extends Application {
 			fenJeu.setScene(sceneJeu);
 			fenJeu.setTitle("Jeu");
 			
-		
-			
 			// fenetre principale
 			Parent root = FXMLLoader.load(getClass().getResource("VueClient.fxml"));
 			Scene scene = new Scene(root);
@@ -36,9 +33,6 @@ public class MainClient extends Application {
 			primaryStage.setScene(scene);
 			primaryStage.setResizable(false);
 			primaryStage.show();
-			
-			
-			
 			
 		} catch(Exception e) {
 			e.printStackTrace();
