@@ -12,7 +12,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-public class CtrlClient {
+public class CtrlClient2 {
 	
 	@FXML TextField tbIP;
 	@FXML TextField tbPort;
@@ -42,8 +42,8 @@ public class CtrlClient {
 		try {
 			registry = LocateRegistry.getRegistry(addressIP, port);
 			stub = (HelloInterface) registry.lookup(nom);
-			MainClient.fenJeu.show();
-			MainClient.ctrlJeu.start();
+			MainClient2.fenJeu.show();
+			MainClient2.ctrlJeu.start();
 			Stage stage = (Stage) tbIP.getScene().getWindow();
 			stage.close();
 		} catch (NumberFormatException | RemoteException e) {

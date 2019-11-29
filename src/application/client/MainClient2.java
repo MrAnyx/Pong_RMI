@@ -8,15 +8,15 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class MainClient extends Application {
+public class MainClient2 extends Application {
 
 	public static Stage fenJeu;
-	public static CtrlJeu ctrlJeu;
+	public static CtrlJeu2 ctrlJeu;
 	
 	public void start(Stage primaryStage) throws Exception{
 		try {
 			//fenetre de jeu
-			FXMLLoader loadJeu = new FXMLLoader(getClass().getResource("VueJeu.fxml"));
+			FXMLLoader loadJeu = new FXMLLoader(getClass().getResource("VueJeu2.fxml"));
 			Parent rootJeu = loadJeu.load();
 			ctrlJeu = loadJeu.getController();
 			Scene sceneJeu = new Scene(rootJeu);
@@ -27,7 +27,7 @@ public class MainClient extends Application {
 			fenJeu.setTitle("Jeu");
 			
 			// fenetre principale
-			Parent root = FXMLLoader.load(getClass().getResource("VueClient.fxml"));
+			Parent root = FXMLLoader.load(getClass().getResource("VueClient2.fxml"));
 			Scene scene = new Scene(root);
 			primaryStage.setTitle("VUE CLIENT");
 			primaryStage.setScene(scene);

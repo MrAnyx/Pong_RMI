@@ -9,10 +9,14 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 
 import application.HelloInterface;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
@@ -32,6 +36,10 @@ public class CtrlServeur extends UnicastRemoteObject implements HelloInterface{
 	@FXML TextArea taInfo;
 	
 	@FXML TextField tbStatus;
+	
+	@FXML ListView<String> listeIP;
+	
+	ObservableList<String> ips = FXCollections.observableArrayList();
 	
 	private int port;
 	private String addressIP;
@@ -69,17 +77,35 @@ public class CtrlServeur extends UnicastRemoteObject implements HelloInterface{
 	private boolean gameStarted;
 	
 	
+	
+	
 	@FXML private void initialize() {
 		taInfo.appendText("Lancement de la fenêtre\n");
 		afficheInfoReseau();
 		tbStatus.setStyle("-fx-background-color:#ff0000");
+		listeIP.setItems(ips);
+		
+		listeIP.getSelectionModel().selectedIndexProperty().addListener(observable -> {
+			tbIP.setText(listeIP.getSelectionModel().getSelectedItem());
+		});
+		
+		
 	}
 	
 	private void afficheInfoReseau() {
 		
 		try {
-			InetAddress inetadr = InetAddress.getLocalHost();
-			addressIP = inetadr.getHostAddress();
+			
+//			InetAddress inetadr = InetAddress.getLocalHost();
+//			addressIP = inetadr.getHostAddress();
+			
+			InetAddress localhost = InetAddress.getLocalHost();
+			InetAddress[] allMyIps = InetAddress.getAllByName(localhost.getCanonicalHostName());
+			
+			for(int i = 0; i<allMyIps.length/2; i++) {
+				ips.add(allMyIps[i].getHostAddress());
+			}
+			
 			
 			port = 19000;
 			nom = "Pong_Serveur";
@@ -93,7 +119,7 @@ public class CtrlServeur extends UnicastRemoteObject implements HelloInterface{
 		} catch (UnknownHostException e) {
 
 			taInfo.appendText("Erreur affichage réseau\n");
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 	
@@ -115,16 +141,17 @@ public class CtrlServeur extends UnicastRemoteObject implements HelloInterface{
 	public boolean lancerServeur() {
 		try {
 			taInfo.appendText("Lancement du serveur ...\n");
+			System.setProperty("java.rmi.server.hostname", tbIP.getText());
 			refRegistry.rebind(nom, (Remote) this);
 			taInfo.appendText("Serveur OK\n");
 			return true;
 		} catch (AccessException e) {
 			taInfo.appendText("Erreur lors du lancement du serveur\n");
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 			return false;
 		} catch (RemoteException e) {
 			taInfo.appendText("Erreur lors du lancement du serveur\n");
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 			return false;
 		}
 	}
